@@ -1,0 +1,23 @@
+{
+  "name": "fp.sectional-planner",
+  "version": "1.0.0",
+  "description": "configure sectional furniture",
+  "main": "main.js",
+  "scripts": {
+    "dev": " bun build ./main.js --outdir ./out --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nikki Koole, Sidney Liebrands",
+  "license": "ISC",
+  "dependencies": {
+    "dat.gui": "^0.7.9",
+    "three": "^0.167.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "type": "module"
+}
