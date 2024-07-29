@@ -1,14 +1,15 @@
 # fp.sectional-planner
 
-experimenting with basic boxes to build a sectional planner
+Experimenting with basic boxes to build a sectional planner.
 
+![image](./screen.png)
 
-#Install
+## how to install
 ```bash
 bun install
 ```
 
-To develop:
+## develop:
 ```bash
 npm run dev
 ```
@@ -16,7 +17,7 @@ which in turn basically just runs:
 ```bash
 bun build ./main.js --outdir ./out --watch
 ```
-For serving it up I used
+ For serving it up I used
 ```bash
     npx serve
 ```
