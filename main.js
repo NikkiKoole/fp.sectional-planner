@@ -1,9 +1,46 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-
 import { DragControls } from "three/addons/controls/DragControls.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+
+import gsap from "gsap";
+import Stats from "stats.js";
+
 //https://github.com/yomotsu/camera-controls
 //https://github.com/yomotsu/camera-controls/blob/fb7b5751043a246b40ec90e45eb09a4ce1b68fe0/examples/fit-and-padding.html
+
+const keyPressed = {};
+document.addEventListener("keydown", (e) => {
+  if (!keyPressed[e.key]) {
+    keyPressed[e.key] = new Date().getTime();
+  }
+});
+document.addEventListener("keyup", (e) => {
+  delete keyPressed[e.key];
+});
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.setAnimationLoop(animate);
+document.body.appendChild(renderer.domElement);
+
+const stats = new Stats();
+stats.showPanel(1); // 0: fps, 1: ms, 2: mb, 3+: custom
+
+stats.dom.style.position = "absolute";
+stats.dom.style.top = "0px";
+stats.dom.style.right = "0px";
+stats.dom.style.left = "unset";
+document.body.appendChild(stats.dom);
+const directions = [
+  { x: 1, y: 0, z: 0 },
+  { x: 0, y: 1, z: 0 },
+  { x: -1, y: 0, z: 0 },
+  { x: 0, y: -1, z: 0 },
+];
+let directionIndex = 0;
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color("#ffb79d");
@@ -17,14 +54,28 @@ const camera = new THREE.PerspectiveCamera(
 camera.up.set(0, 0, 1);
 camera.position.z = 5;
 
-const directions = [
-  { x: 1, y: 0, z: 0 },
-  { x: 0, y: 1, z: 0 },
-  { x: -1, y: 0, z: 0 },
-  { x: 0, y: -1, z: 0 },
-];
-let directionIndex = 0;
+const loader = new GLTFLoader();
 
+function addModel(url, x, y, z) {
+  loader.load(
+    url,
+    function (gltf) {
+      gltf.scene.position.set(x, y, z);
+      scene.add(gltf.scene);
+    },
+    undefined,
+    function (error) {
+      console.error(error);
+    },
+  );
+}
+
+for (let i = 0; i < 10; i++) {
+  addModel("./GLB/character-male-b.glb", Math.random() * 10 - 5, 0, 0);
+}
+for (let i = 0; i < 10; i++) {
+  addModel("./GLB2/bedBunk.glb", Math.random() * 10 - 5, 0, 0);
+}
 {
   const skyColor = 0xb1e1ff; // light blue
   const groundColor = 0xb97a20; // brownish orange
@@ -32,25 +83,57 @@ let directionIndex = 0;
   const light = new THREE.HemisphereLight(skyColor, groundColor, intensity);
   scene.add(light);
 }
-
-const light1 = new THREE.DirectionalLight(0xffffff, 3);
-light1.position.set(10, 10, 5); //.normalize();
-light1.castShadow = true;
-
-light1.shadow.mapSize.width = 512;
-light1.shadow.mapSize.height = 512;
-light1.shadow.camera.near = 0.5;
-light1.shadow.camera.far = 500;
-const pointLightHelper = new THREE.PointLightHelper(light1, 1);
-scene.add(pointLightHelper);
-scene.add(light1);
-
-const light2 = new THREE.AmbientLight(0xcccccc);
-scene.add(light2);
-
+{
+  const light1 = new THREE.DirectionalLight(0xff00ff, 2);
+  light1.position.set(10, 10, 5); //.normalize();
+  light1.castShadow = true;
+  light1.shadow.mapSize.width = 512;
+  light1.shadow.mapSize.height = 512;
+  light1.shadow.camera.near = 0.5;
+  light1.shadow.camera.far = 500;
+  const pointLightHelper = new THREE.PointLightHelper(light1, 1);
+  scene.add(pointLightHelper);
+  scene.add(light1);
+}
+{
+  const light1 = new THREE.DirectionalLight(0xffff00, 2);
+  light1.position.set(10, -10, 5); //.normalize();
+  light1.castShadow = true;
+  light1.shadow.mapSize.width = 512;
+  light1.shadow.mapSize.height = 512;
+  light1.shadow.camera.near = 0.5;
+  light1.shadow.camera.far = 500;
+  const pointLightHelper = new THREE.PointLightHelper(light1, 1);
+  scene.add(pointLightHelper);
+  scene.add(light1);
+}
+{
+  const light1 = new THREE.DirectionalLight(0x00ffff, 2);
+  light1.position.set(-10, -10, 5); //.normalize();
+  light1.castShadow = true;
+  light1.shadow.mapSize.width = 512;
+  light1.shadow.mapSize.height = 512;
+  light1.shadow.camera.near = 0.5;
+  light1.shadow.camera.far = 500;
+  const pointLightHelper = new THREE.PointLightHelper(light1, 1);
+  scene.add(pointLightHelper);
+  scene.add(light1);
+}
+{
+  const light1 = new THREE.DirectionalLight(0xffffff, 2);
+  light1.position.set(-10, 10, 5); //.normalize();
+  light1.castShadow = true;
+  light1.shadow.mapSize.width = 512;
+  light1.shadow.mapSize.height = 512;
+  light1.shadow.camera.near = 0.5;
+  light1.shadow.camera.far = 500;
+  const pointLightHelper = new THREE.PointLightHelper(light1, 1);
+  scene.add(pointLightHelper);
+  scene.add(light1);
+}
 const planeGeometry = new THREE.PlaneGeometry(20, 20, 32);
 const planeMaterial = new THREE.MeshStandardMaterial({
-  color: 0xf0f0f0,
+  color: 0xc2ba92,
   side: THREE.DoubleSide,
 });
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -58,21 +141,10 @@ plane.position.z = -0.501;
 plane.receiveShadow = true;
 scene.add(plane);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.setAnimationLoop(animate);
-document.body.appendChild(renderer.domElement);
-
 const controls = new OrbitControls(camera, renderer.domElement);
-//controls.minAzimuthAngle = 0;
-//controls.maxAzimuthAngle = 0;
+
 controls.zoomToCursor = true;
-controls.maxPolarAngle = Math.PI / 2;
-//controls.minPolarAngle = 0;
-//controls.maxPolarAngle = 0;
-//controls.update();
+controls.maxPolarAngle = Math.PI / 2 - 0.001;
 
 const buttonContainer = document.createElement("div");
 buttonContainer.className = "buttons";
@@ -120,7 +192,14 @@ buttonContainer.appendChild(
     }
   }),
 );
-let isDraggingThing = false;
+
+const geometry = new THREE.SphereGeometry(1, 32, 32);
+const material = new THREE.MeshLambertMaterial({ color: 0xffff00 });
+const sphere = new THREE.Mesh(geometry, material);
+sphere.position.set(2, 2, 1);
+sphere.castShadow = true;
+scene.add(sphere);
+
 const group = new THREE.Object3D();
 for (let i = 0; i < 1; ++i) {
   let { cube } = makeNiceCube(i, 0, 0);
@@ -128,16 +207,51 @@ for (let i = 0; i < 1; ++i) {
   cube.castShadow = true;
   group.add(cube);
 }
-if (false) {
-  const dragcontrols = new DragControls(
-    group.children,
-    camera,
-    renderer.domElement,
-  );
-  dragcontrols.addEventListener("drag", animate);
-  dragcontrols.addEventListener("dragstart", () => (isDraggingThing = true));
-  dragcontrols.addEventListener("dragend", () => (isDraggingThing = false));
-} //default is false
+
+//const dragcontrols1 = new DragControls([sphere], camera, renderer.domElement);
+
+const dragcontrols = new DragControls(
+  group.children,
+  camera,
+  renderer.domElement,
+);
+
+let startPosition = new THREE.Vector3();
+
+dragcontrols.addEventListener("dragstart", (event) => {
+  controls.enabled = false;
+  event.object.material.emissive.set(0xaaaaaa);
+  let rotZ = event.object.rotation.z;
+  gsap.to(event.object.rotation, { duration: 0.3, z: rotZ + Math.PI / 2 });
+  startPosition.copy(event.object.position);
+});
+
+dragcontrols.addEventListener("drag", (event) => {
+  if (keyPressed["x"]) {
+    event.object.position.set(
+      event.object.position.x,
+      startPosition.y,
+      startPosition.z,
+    );
+  } else if (keyPressed["y"]) {
+    event.object.position.set(
+      startPosition.x,
+      event.object.position.y,
+      startPosition.z,
+    );
+  } else if (keyPressed["z"]) {
+    event.object.position.set(
+      startPosition.x,
+      startPosition.y,
+      event.object.position.z,
+    );
+  }
+});
+dragcontrols.addEventListener("dragend", (event) => {
+  controls.enabled = true;
+  event.object.material.emissive.set(0x000000);
+});
+
 scene.add(group);
 
 function createButton(label, onClick) {
@@ -158,7 +272,7 @@ function makeNiceCube(x, y, z) {
   line.position.set(x, y, z);
 
   const material = new THREE.MeshLambertMaterial({
-    color: new THREE.Color(`hsl(${Math.random() * 360}, 60%, 90%)`),
+    color: new THREE.Color(`hsl(${Math.random() * 360}, 60%, 60%)`),
   });
   const cube = new THREE.Mesh(geometry, material);
   cube.position.set(x, y, z);
@@ -175,7 +289,43 @@ function onWindowResize() {
 }
 
 function animate() {
-  //group.rotateZ(0.001);
+  stats.begin();
   renderer.render(scene, camera);
-  //controls.update();
+  stats.end();
+  if (false) {
+    Object.entries(keyPressed).forEach((e) => {
+      console.log(e);
+      const [key, start] = e;
+      const duration = new Date().getTime() - start;
+
+      // increase momentum if key pressed longer
+      let momentum = Math.sqrt(duration + 200) * 0.01 + 0.05;
+
+      // adjust for actual time passed
+      // momentum = (momentum * delta) / 0.016;
+
+      // increase momentum if camera higher
+      momentum = momentum + camera.position.z * 0.02;
+
+      switch (key) {
+        case "w":
+          camera.translateY(momentum);
+          controls.update();
+          break;
+        case "s":
+          camera.translateY(-momentum);
+          controls.update();
+          break;
+        case "d":
+          camera.translateX(momentum);
+          controls.update();
+          break;
+        case "a":
+          camera.translateX(-momentum);
+          controls.update();
+          break;
+        default:
+      }
+    });
+  }
 }
