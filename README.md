@@ -3,6 +3,8 @@
 Experimenting with basic boxes to build a sectional planner.
 
 ![image](./screen.png)
+
+ok i got sidetracked into modelloading, shadow casting, lights and tweens...
 ![image](./jumpingguys.gif)
 ## how to install
 ```bash
