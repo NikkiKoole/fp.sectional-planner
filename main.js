@@ -36,9 +36,9 @@ stats.dom.style.left = "unset";
 document.body.appendChild(stats.dom);
 const directions = [
   { x: 1, y: 0, z: 0 },
-  { x: 0, y: 1, z: 0 },
+  { x: 0, y: 0, z: 1 },
   { x: -1, y: 0, z: 0 },
-  { x: 0, y: -1, z: 0 },
+  { x: 0, y: 0, z: -1 },
 ];
 let directionIndex = 0;
 
@@ -51,17 +51,39 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000,
 );
-camera.up.set(0, 0, 1);
+//camera.up.set(0, 0, 1);
 camera.position.z = 5;
-
+const group = new THREE.Object3D();
 const loader = new GLTFLoader();
-
+const characters = [];
 function addModel(url, x, y, z) {
   loader.load(
     url,
     function (gltf) {
       gltf.scene.position.set(x, y, z);
+      gltf.scene.rotation.set(0, Math.random() * Math.PI * 2, 0);
+
+      gltf.scene.traverse(function (node) {
+        if (node.isMesh) {
+          node.castShadow = true;
+        }
+      });
+
+      gltf.scene.castShadow = true;
+
       scene.add(gltf.scene);
+
+      if (url.indexOf("character") > -1) {
+        let y = Math.random() + 0.5;
+        let r = gltf.scene.rotation.y;
+        gsap.to(gltf.scene.position, {
+          duration: 1 + y / 2,
+          y,
+          repeat: -1,
+          yoyo: true, // Reverse the animation direction
+          ease: "bounce.in", // Smooth easing function
+        });
+      }
     },
     undefined,
     function (error) {
@@ -70,12 +92,45 @@ function addModel(url, x, y, z) {
   );
 }
 
-for (let i = 0; i < 10; i++) {
-  addModel("./GLB/character-male-b.glb", Math.random() * 10 - 5, 0, 0);
-}
-for (let i = 0; i < 10; i++) {
-  addModel("./GLB2/bedBunk.glb", Math.random() * 10 - 5, 0, 0);
-}
+const models = [
+  "./GLB/character-female-a.glb",
+  "./GLB/character-female-b.glb",
+  "./GLB/character-female-c.glb",
+  "./GLB/character-female-d.glb",
+  "./GLB/character-male-c.glb",
+  "./GLB/character-male-b.glb",
+  "./GLB2/cabinetTelevisionDoors.glb",
+  "./GLB2/kitchenFridgeLarge.glb",
+  "./GLB2/bedBunk.glb",
+  "./GLB2/rugDoormat.glb",
+  "./GLB2/shower.glb",
+  "./GLB2/wall.glb",
+  "./GLB2/wall.glb",
+  "./GLB2/wall.glb",
+  "./GLB2/wall.glb",
+  "./GLB2/toilet.glb",
+  "./GLB2/televisionModern.glb",
+  "./GLB2/wallWindow.glb",
+  "./GLB3/bevel-hq-brick-2x8.glb",
+  //"./GLB4/firetruck.glb",
+  //"./GLB4/ambulance.glb",
+  //"./GLB4/tractor.glb",
+  //"./GLB4/race.glb",
+  // "./GLB4/sedan.glb",
+  //"./GLB4/debris-drivetrain.glb",
+];
+const spread = 15;
+models.forEach((m) => {
+  for (let i = 0; i < 10; i++) {
+    addModel(
+      m,
+      Math.random() * spread - spread / 2,
+      0,
+      Math.random() * spread - spread / 2,
+    );
+  }
+});
+
 {
   const skyColor = 0xb1e1ff; // light blue
   const groundColor = 0xb97a20; // brownish orange
@@ -83,69 +138,77 @@ for (let i = 0; i < 10; i++) {
   const light = new THREE.HemisphereLight(skyColor, groundColor, intensity);
   scene.add(light);
 }
-{
-  const light1 = new THREE.DirectionalLight(0xff00ff, 2);
-  light1.position.set(10, 10, 5); //.normalize();
-  light1.castShadow = true;
-  light1.shadow.mapSize.width = 512;
-  light1.shadow.mapSize.height = 512;
-  light1.shadow.camera.near = 0.5;
-  light1.shadow.camera.far = 500;
-  const pointLightHelper = new THREE.PointLightHelper(light1, 1);
-  scene.add(pointLightHelper);
-  scene.add(light1);
+if (true) {
+  {
+    const light1 = new THREE.DirectionalLight(0xff00ff, 2);
+    light1.position.set(10, 5, -10); //.normalize();
+    light1.castShadow = true;
+    light1.shadow.mapSize.width = 5120;
+    light1.shadow.mapSize.height = 5120;
+    light1.shadow.camera.near = 0.5;
+    light1.shadow.camera.far = 500;
+    const pointLightHelper = new THREE.PointLightHelper(light1, 1);
+    scene.add(pointLightHelper);
+    scene.add(light1);
+    gsap.to(light1.position, { duration: 10, z: 10, repeat: -1, yoyo: true });
+  }
+  {
+    const light1 = new THREE.DirectionalLight(0xffff00, 2);
+    light1.position.set(10, 5, 10); //.normalize();
+    light1.castShadow = true;
+    light1.shadow.mapSize.width = 5120;
+    light1.shadow.mapSize.height = 5120;
+    light1.shadow.camera.near = 0.5;
+    light1.shadow.camera.far = 500;
+    const pointLightHelper = new THREE.PointLightHelper(light1, 1);
+    scene.add(pointLightHelper);
+    scene.add(light1);
+    gsap.to(light1.position, { duration: 10, z: -10, repeat: -1, yoyo: true });
+  }
+  {
+    const light1 = new THREE.DirectionalLight(0x00ffff, 2);
+    light1.position.set(-10, 5, -10); //.normalize();
+    light1.castShadow = true;
+    light1.shadow.mapSize.width = 5120;
+    light1.shadow.mapSize.height = 5120;
+    light1.shadow.camera.near = 0.5;
+    light1.shadow.camera.far = 500;
+    const pointLightHelper = new THREE.PointLightHelper(light1, 1);
+    scene.add(pointLightHelper);
+    scene.add(light1);
+    gsap.to(light1.position, { duration: 10, z: 10, repeat: -1, yoyo: true });
+  }
+  {
+    const light1 = new THREE.DirectionalLight(0xff0000, 2);
+    light1.position.set(-10, 5, 10); //.normalize();
+    light1.castShadow = true;
+    light1.shadow.mapSize.width = 5120;
+    light1.shadow.mapSize.height = 5120;
+    light1.shadow.camera.near = 0.5;
+    light1.shadow.camera.far = 500;
+    const pointLightHelper = new THREE.PointLightHelper(light1, 1);
+    scene.add(pointLightHelper);
+    scene.add(light1);
+    gsap.to(light1.position, { duration: 10, z: -10, repeat: -1, yoyo: true });
+  }
 }
-{
-  const light1 = new THREE.DirectionalLight(0xffff00, 2);
-  light1.position.set(10, -10, 5); //.normalize();
-  light1.castShadow = true;
-  light1.shadow.mapSize.width = 512;
-  light1.shadow.mapSize.height = 512;
-  light1.shadow.camera.near = 0.5;
-  light1.shadow.camera.far = 500;
-  const pointLightHelper = new THREE.PointLightHelper(light1, 1);
-  scene.add(pointLightHelper);
-  scene.add(light1);
-}
-{
-  const light1 = new THREE.DirectionalLight(0x00ffff, 2);
-  light1.position.set(-10, -10, 5); //.normalize();
-  light1.castShadow = true;
-  light1.shadow.mapSize.width = 512;
-  light1.shadow.mapSize.height = 512;
-  light1.shadow.camera.near = 0.5;
-  light1.shadow.camera.far = 500;
-  const pointLightHelper = new THREE.PointLightHelper(light1, 1);
-  scene.add(pointLightHelper);
-  scene.add(light1);
-}
-{
-  const light1 = new THREE.DirectionalLight(0xffffff, 2);
-  light1.position.set(-10, 10, 5); //.normalize();
-  light1.castShadow = true;
-  light1.shadow.mapSize.width = 512;
-  light1.shadow.mapSize.height = 512;
-  light1.shadow.camera.near = 0.5;
-  light1.shadow.camera.far = 500;
-  const pointLightHelper = new THREE.PointLightHelper(light1, 1);
-  scene.add(pointLightHelper);
-  scene.add(light1);
-}
-const planeGeometry = new THREE.PlaneGeometry(20, 20, 32);
+const planeGeometry = new THREE.BoxGeometry(20, 0.1, 20);
 const planeMaterial = new THREE.MeshStandardMaterial({
   color: 0xc2ba92,
   side: THREE.DoubleSide,
 });
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-plane.position.z = -0.501;
+plane.position.y = -0.1;
 plane.receiveShadow = true;
+
 scene.add(plane);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
 controls.zoomToCursor = true;
-controls.maxPolarAngle = Math.PI / 2 - 0.001;
-
+controls.maxPolarAngle = Math.PI / 2 - 0.1;
+controls.minPolarAngle = 0.1;
+controls.update();
 const buttonContainer = document.createElement("div");
 buttonContainer.className = "buttons";
 document.body.appendChild(buttonContainer);
@@ -200,9 +263,8 @@ sphere.position.set(2, 2, 1);
 sphere.castShadow = true;
 scene.add(sphere);
 
-const group = new THREE.Object3D();
 for (let i = 0; i < 1; ++i) {
-  let { cube } = makeNiceCube(i, 0, 0);
+  let { cube } = makeNiceCube(i, 0.5, 0);
   cube.directionAddedIndex = directionIndex;
   cube.castShadow = true;
   group.add(cube);
@@ -221,8 +283,8 @@ let startPosition = new THREE.Vector3();
 dragcontrols.addEventListener("dragstart", (event) => {
   controls.enabled = false;
   event.object.material.emissive.set(0xaaaaaa);
-  let rotZ = event.object.rotation.z;
-  gsap.to(event.object.rotation, { duration: 0.3, z: rotZ + Math.PI / 2 });
+  let rotY = event.object.rotation.y;
+  gsap.to(event.object.rotation, { duration: 0.3, y: rotY + Math.PI / 2 });
   startPosition.copy(event.object.position);
 });
 
