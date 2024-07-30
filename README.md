@@ -3,7 +3,7 @@
 Experimenting with basic boxes to build a sectional planner.
 
 ![image](./screen.png)
-
+![image](./jumpingguys.gif)
 ## how to install
 ```bash
 bun install
