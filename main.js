@@ -30,7 +30,7 @@ scene.add(light1);
 const light2 = new THREE.AmbientLight(0xcccccc);
 scene.add(light2);
 
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setAnimationLoop(animate);
 document.body.appendChild(renderer.domElement);
@@ -71,10 +71,8 @@ buttonContainer.appendChild(
   createButton("remove", function () {
     if (group.children.length > 1) {
       group.remove(group.children[group.children.length - 1]);
-      direction =
-        directions[
-          group.children[group.children.length - 1].directionAddedIndex
-        ];
+      directionIndex =
+        group.children[group.children.length - 1].directionAddedIndex;
     }
   }),
 );
@@ -114,6 +112,7 @@ function makeNiceCube(x, y, z) {
 }
 
 function animate() {
+  group.rotateY(0.001);
   renderer.render(scene, camera);
   controls.update();
 }
