@@ -13,6 +13,11 @@ const keyPressed = {};
 document.addEventListener("keydown", (e) => {
   if (!keyPressed[e.key]) {
     keyPressed[e.key] = new Date().getTime();
+    if (draggingObject) {
+      if (e.key == "x" || e.key == "y" || e.key == "z") {
+        startPosition.copy(draggingObject.position);
+      }
+    }
   }
 });
 document.addEventListener("keyup", (e) => {
@@ -281,6 +286,7 @@ const dragcontrols = new DragControls(
 let startPosition = new THREE.Vector3();
 
 dragcontrols.addEventListener("dragstart", (event) => {
+  draggingObject = event.object;
   controls.enabled = false;
   event.object.material.emissive.set(0xaaaaaa);
   let rotY = event.object.rotation.y;
@@ -310,6 +316,7 @@ dragcontrols.addEventListener("drag", (event) => {
   }
 });
 dragcontrols.addEventListener("dragend", (event) => {
+  draggingObject = undefined;
   controls.enabled = true;
   event.object.material.emissive.set(0x000000);
 });
